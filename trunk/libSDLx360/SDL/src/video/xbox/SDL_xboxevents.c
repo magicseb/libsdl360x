@@ -258,7 +258,7 @@ static SDL_keysym *TranslateKey(UINT scancode, SDL_keysym *keysym, int pressed)
 static void mouse_update(void)
 {
 
-#ifdef DEVKIT		// devkits can have a real mouse attached via xbdm
+#ifdef MOUSE		// can have a real mouse attached
 	static UCHAR mouseButtons = 0, changed;
 	int i;	 
 	static UCHAR prev_buttons;	
@@ -306,7 +306,7 @@ static void mouse_update(void)
 	#define DM_MOUSE_LBUTTON    0x01    //Left button
 	#define DM_MOUSE_RBUTTON    0x02    //Right button
 	#define DM_MOUSE_MBUTTON    0x04    //Middle button
-
+ 
 	XINPUT_STATE stateJoy;
 
 	static UCHAR mouseButtons = 0, changed;
@@ -327,21 +327,26 @@ static void mouse_update(void)
 	// poll every 6th frame
 
 	if (mouseFrames >= 6)
-	{
+{
 		// Simply get the state of the controller from XInput.
 
 		dwResult = XInputGetState( 0, &stateJoy );
+if(((stateJoy.Gamepad.sThumbLX > 8000)||(stateJoy.Gamepad.sThumbLX < -8000))||((stateJoy.Gamepad.sThumbLY > 8000)||(stateJoy.Gamepad.sThumbLY < -8000)))
+{
+		nX = ((stateJoy.Gamepad.sThumbLX/3000));
+		nY = ((stateJoy.Gamepad.sThumbLY/2000)* -1);
 
-		nX = ((stateJoy.Gamepad.sThumbLX/7000));
-		nY = ((stateJoy.Gamepad.sThumbLY/4096)* -1);
-
-
+ 
 		mouseX = nX;
 		mouseY = nY;
 
 		if (mouseX||mouseY)
 			SDL_PrivateMouseMotion(0,1, mouseX, mouseY);
 
+		lastmouseX = nX;
+		lastmouseY = nY;
+
+}
 		mouseButtons = 0;
 
 		if (stateJoy.Gamepad.wButtons & XINPUT_GAMEPAD_A)
@@ -355,11 +360,9 @@ static void mouse_update(void)
 			if (changed & sdl_mousebtn[i]) {
 				SDL_PrivateMouseButton((mouseButtons & sdl_mousebtn[i])?SDL_PRESSED:SDL_RELEASED,i+1,0,0);
 			}
-		}		
+		}
 
 		prev_buttons = mouseButtons;
-		lastmouseX = nX;
-		lastmouseY = nY;
 
 		mouseFrames = 0;
 	}
@@ -368,7 +371,7 @@ static void mouse_update(void)
 
 
 #endif
-
+ 
 }
 
  
