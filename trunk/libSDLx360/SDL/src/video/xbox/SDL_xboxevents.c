@@ -34,7 +34,7 @@ static char rcsid =
 #include <xtl.h>
 #endif
 
-#ifdef DEVKIT
+#ifdef MOUSE
 #include <xbdm.h>
 #pragma comment( lib, "xbdm.lib" )
 #endif
@@ -331,22 +331,25 @@ static void mouse_update(void)
 		// Simply get the state of the controller from XInput.
 
 		dwResult = XInputGetState( 0, &stateJoy );
-if(((stateJoy.Gamepad.sThumbLX > 8000)||(stateJoy.Gamepad.sThumbLX < -8000))||((stateJoy.Gamepad.sThumbLY > 8000)||(stateJoy.Gamepad.sThumbLY < -8000)))
-{
-		nX = ((stateJoy.Gamepad.sThumbLX/3000));
-		nY = ((stateJoy.Gamepad.sThumbLY/2000)* -1);
+		if(((stateJoy.Gamepad.sThumbLX > 8000)||
+			(stateJoy.Gamepad.sThumbLX < -8000))||
+			((stateJoy.Gamepad.sThumbLY > 8000)||
+			(stateJoy.Gamepad.sThumbLY < -8000)))
+		{
+			nX = ((stateJoy.Gamepad.sThumbLX/3000));
+			nY = ((stateJoy.Gamepad.sThumbLY/2000)* -1);
 
- 
-		mouseX = nX;
-		mouseY = nY;
+	 
+			mouseX = nX;
+			mouseY = nY;
 
-		if (mouseX||mouseY)
-			SDL_PrivateMouseMotion(0,1, mouseX, mouseY);
+			if (mouseX||mouseY)
+				SDL_PrivateMouseMotion(0,1, mouseX, mouseY);
 
-		lastmouseX = nX;
-		lastmouseY = nY;
+			lastmouseX = nX;
+			lastmouseY = nY;
 
-}
+		}
 		mouseButtons = 0;
 
 		if (stateJoy.Gamepad.wButtons & XINPUT_GAMEPAD_A)
